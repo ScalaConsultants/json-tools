@@ -8,7 +8,7 @@ package object jsontools {
       //render called with JNothing throws error
       // https://github.com/lift/framework/blob/master/core/json/src/main/scala/net/liftweb/json/JsonAST.scala#L420
       def pretty: String = jvalue match {
-        case JNothing => " "
+        case JNothing => ""
         case _ => net.liftweb.json.pretty(render(jvalue))
       }
     }
