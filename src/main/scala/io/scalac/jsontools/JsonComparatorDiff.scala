@@ -2,8 +2,22 @@ package io.scalac.jsontools
 
 import net.liftweb.json._
 
-object ApiaryDiff {
+/**
+ * Creates Diffs between two JSON formatted inputs.
+ * One being the real-life API return and the second an expected schema.
+ */
+object JsonComparatorDiff {
 
+  /**
+   * Performs the diff procedure between api and schema.
+   * The values in specific fields are not matched literally - 
+   * the diff cares about the structure, not the content.
+   * For instance:
+   *  - comparing one element array from schema against an non-empty array from api results in comparing the schema element to every element of the api
+   * @param api JValue holding the data returned by the system
+   * @param schema JValue representing the schema, that we will match api against
+   * @return Code returns a lift Diff class containing the result
+   */
   def diff(api: JValue, schema: JValue): Diff = (api, schema) match {
     case (a, s) if a == s => Diff(JNothing, JNothing, JNothing)
     case (JObject(a), JObject(s)) => diffFields(a, s)
@@ -17,6 +31,9 @@ object ApiaryDiff {
     case (a, s) => Diff(JNothing, s, a)
   }
 
+  /**
+   * Compares two JObjects by comparing their respective fields
+   */
   private def diffFields(api: List[JField], schema: List[JField]) = {
     def diffRec(xleft: List[JField], yleft: List[JField]): Diff = xleft match {
       case Nil => Diff(JNothing, if (yleft.isEmpty) JNothing else JObject(yleft), JNothing)
@@ -37,6 +54,9 @@ object ApiaryDiff {
     diffRec(api, schema)
   }
 
+  /**
+   * Compares two arrays by comparing values stored in them
+   */
   private def diffVals(api: List[JValue], schema: List[JValue]) = {
     def diffRec(xleft: List[JValue], yleft: List[JValue]): Diff = (xleft, yleft) match {
       case (a, Nil) => //no element in schema
@@ -50,7 +70,7 @@ object ApiaryDiff {
       case (a, s :: Nil) => //instead of list schema defines only one element
         a.foldLeft(Diff(JNothing, JNothing, JNothing)) {
           case (Diff(changed, added, removed), arrayElem) => {
-            val diff = ApiaryDiff.diff(arrayElem, s)
+            val diff = JsonComparatorDiff.diff(arrayElem, s)
             Diff(changed ++ diff.changed, added ++ diff.added, removed ++ diff.deleted)
           }
         }

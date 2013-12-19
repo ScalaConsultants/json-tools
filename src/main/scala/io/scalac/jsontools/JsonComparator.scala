@@ -39,7 +39,7 @@ object JsonComparator {
    * @return JsonCompareMismatch showing the comparison result or JsonCompareOK if there is no difference
    */
   def compare(apiJson: JValue, schemaJson: JValue) = {
-    ApiaryDiff.diff(apiJson, schemaJson) match {
+    JsonComparatorDiff.diff(apiJson, schemaJson) match {
       case Diff(_, JNothing, JNothing) => JsonCompareOK
       case Diff(_, added, deleted) => JsonCompareMismatch(added, deleted, apiJson, schemaJson)
     }
