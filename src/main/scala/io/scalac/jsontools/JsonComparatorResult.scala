@@ -36,35 +36,32 @@ case class JsonCompareMismatch(removed: JValue, added: JValue, api: JValue, expe
   def diffFormatted = {
     val formattedStr = new StringBuilder()
     
-    def separator = formattedStr ++= "\n --- \n"
+    val empty = JObject(List())
+    val addedSign = "+"
+    val deletedSign = "-"
     
-    def formatAsDiff(json: JValue) = json match {
-      case changedField @ JField(key, value) if (added \\ key) != JObject(List()) && (removed \\ key) != JObject(List()) => 
-        val newField = (added \\ key)
-        formattedStr ++= "> "
-        formattedStr ++= newField.pretty
-        formattedStr ++= "\n"
+    def formatAsDiff(json: JValue, added: JValue, removed: JValue): StringBuilder = json match {
+      case changedField @ JField(key, value) if (added \\ key) != empty && (removed \\ key) != empty => 
+        val add = (added \\ key)
+        val rem = (removed \\ key)
+        formattedStr ++= s"$addedSign${add.pretty} \n$deletedSign${rem.pretty}\n"
+      case addedField @ JField(key, value) if (added \\ key) != empty => 
+        formattedStr ++= s"$addedSign${addedField.pretty} \n$deletedSign\n"
+      case removedField @ JField(key, JObject(value)) if (removed \\ key) != empty => 
+        val jobject = removedField \\ key
+        val add = (added \\ key)
+        val rem = (removed \\ key)
         
-        val oldField = (removed \\ key)
-        formattedStr ++= "< "
-        formattedStr ++= oldField.toString//.pretty
-        separator
-      case addedField @ JField(key, value) if (added \\ key) != JObject(List()) => 
-        formattedStr ++= "> "
-        formattedStr ++= addedField.pretty
-        formattedStr ++= "\n< "
-        separator
-      case removedField @ JField(key, value) if (removed \\ key) != JObject(List()) => 
-        formattedStr ++= "> \n\n"
-        formattedStr ++= "< "
-        formattedStr ++= removedField.pretty
-        separator
-      case simple => 
-        formattedStr ++= simple.pretty
-        formattedStr ++= "\n"
+        formattedStr ++= "{\n"
+        jobject.children.foreach(formatAsDiff(_, add, rem))
+        formattedStr ++= "}\n"
+      case removedField @ JField(key, value) if (removed \\ key) != empty => 
+        formattedStr ++= s"$addedSign\n$deletedSign${removedField.pretty}\n"
+      case ok => 
+        formattedStr ++= s" ${ok.pretty}\n"
     }
     
-    api.children.foreach(formatAsDiff(_))//the initial api object is wrapped in object
+    (api merge expected).children.foreach(formatAsDiff(_, added, removed))//the initial api object is wrapped in object
     formattedStr.toString
   }
 }

@@ -56,10 +56,14 @@ class ComparatorSpec extends Specification {
     }
     
     "create diffable report on mismatch" in {
-      val apiJson = json ~ ("addedField" , "this is a new field") ~ ("changedField" , 42)
-      val schemaJson = json ~ ("removedField" , "this field has been deleted") ~ ("changedField" , "I should be a string") 
+      val apiJson = json ~ ("addedField" , "this is a new field") ~ 
+        ("changedField" , 42) ~ ("nestedObject", ("smallNumber", "1234"))
+      val schemaJson = json ~ ("removedField" , "this field has been deleted") ~ 
+        ("changedField" , "I should be a string") ~ ("nestedObject", 
+            ("smallNumber", "1234") ~ ("bigNumber", "5678")) 
       val result = JsonComparator.compare(apiJson, schemaJson)
-      println("Diff:\n" + result.diffFormatted)
+      println("RAW: " + result + "\n\n\n")
+      println( result.diffFormatted )
       success
     }
   }
