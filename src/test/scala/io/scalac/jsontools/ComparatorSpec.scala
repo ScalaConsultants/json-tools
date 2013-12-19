@@ -23,7 +23,7 @@ class ComparatorSpec extends Specification {
       result.hasMinimalFieldSet must be equalTo false
     }
     
-    "return Mismatch on missing data" in {
+    "return Mismatch on added data" in {
       val jsonApi = json ~ ("extra" -> "added in api; not mentioned in schema")
       val result = JsonComparator.compare(jsonApi, json) 
       result match {
@@ -53,6 +53,14 @@ class ComparatorSpec extends Specification {
       
       val result = JsonComparator.compare(json1, json2)
       result must be equalTo JsonCompareOK
+    }
+    
+    "create diffable report on mismatch" in {
+      val apiJson = json ~ ("addedField" , "this is a new field") ~ ("changedField" , 42)
+      val schemaJson = json ~ ("removedField" , "this field has been deleted") ~ ("changedField" , "I should be a string") 
+      val result = JsonComparator.compare(apiJson, schemaJson)
+      println("Diff:\n" + result.diffFormatted)
+      success
     }
   }
 }
