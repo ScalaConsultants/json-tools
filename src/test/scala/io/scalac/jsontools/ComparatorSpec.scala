@@ -33,5 +33,26 @@ class ComparatorSpec extends Specification {
       
       result.hasMinimalFieldSet must be equalTo true
     }
+    
+    "validate types for fields" in {
+      val embeddedObject = ("1" -> "one") ~ ("2" -> "two")
+      val jsonWithObject = json ~ ("field" -> embeddedObject)
+      val jsonWithArray = json ~ ("field" -> List("one", "two"))
+      
+      val result = JsonComparator.compare(jsonWithObject, jsonWithArray)
+      result match {
+        case JsonCompareMismatch(missingArray, addedObject, _, _) => success
+        case _ => failure
+      }
+    }
+    
+    "be resistant to field order" in {
+      val embeddedObject = ("1" -> "one") ~ ("2" -> "two")
+      val json1 = json ~ embeddedObject
+      val json2 = embeddedObject ~ json
+      
+      val result = JsonComparator.compare(json1, json2)
+      result must be equalTo JsonCompareOK
+    }
   }
 }
