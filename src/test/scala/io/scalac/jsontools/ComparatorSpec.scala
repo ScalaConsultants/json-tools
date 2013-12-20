@@ -62,7 +62,6 @@ class ComparatorSpec extends Specification {
         ("changedField" , "I should be a string") ~ ("nestedObject", 
             ("smallNumber", "1234") ~ ("bigNumber", "5678")) 
       val result = JsonComparator.compare(apiJson, schemaJson)
-      println("RAW: " + result + "\n\n\n")
       println( result.diffFormatted )
       success
     }
