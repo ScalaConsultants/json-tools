@@ -44,4 +44,22 @@ object JsonComparator {
       case Diff(_, added, deleted) => JsonCompareMismatch(added, deleted, apiJson, schemaJson)
     }
   }
+  
+  /**
+   * Compares the output of a producer with a specified schema. 
+   * While the producer creates valid output (not None) it's outputs are compared and the results are combined 
+   * into a list of JsonComparatorResult
+   * @param producer No parameter function returning Option[JValue], which output is same as api response
+   * @param schemaJson JValue holding the desired JSON schema
+   * @return List of concatenated results in order of evaluation
+   */
+  def compareWithProducer(producer: () => Option[JValue], schemaJson: JValue) = {
+    def validateJson(json: Option[JValue]) : List[JsonComparatorResult] = {
+      json.map(j => { 
+        compare(j, schemaJson) :: validateJson(producer())
+      }).getOrElse(Nil)
+    }
+    
+    validateJson(producer())
+  }
 }

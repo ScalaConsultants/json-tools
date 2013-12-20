@@ -23,12 +23,19 @@ abstract class JsonComparatorResult {
    */
   def diffFormatted: String
 }
+
+/**
+ * Result of comparison indicating that the compared JSON have same structure
+ */
 case object JsonCompareOK extends JsonComparatorResult {
   def report = "No difference"
   def hasMinimalFieldSet = true
   def diffFormatted = "No difference"
 }
 
+/**
+ * Result of comparison indicating that compared JSON don't match
+ */
 case class JsonCompareMismatch(removed: JValue, added: JValue, api: JValue, expected: JValue) extends JsonComparatorResult {
   def report = "Comparison result: \nAdded: " + added.pretty + " \nRemoved: " + removed.pretty
   def hasMinimalFieldSet = removed == JNothing
