@@ -1,5 +1,8 @@
 package io.scalac.http
 
+/**
+ * HTTP Request methods
+ */
 object ReqMethod extends Enumeration {
   type ReqMethod = Value
   val GET = Value("GET")
