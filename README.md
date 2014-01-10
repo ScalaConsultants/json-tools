@@ -22,5 +22,10 @@ result match {
   case _ => // everything is fine
 }
 ```
+####Make sure all the needed keys are present 
+Some aditional data might be returned with it, but we ignore it
+```
+compareResult.hasMinimalFieldSet must be equalTo true
+```
 ####For more examples please take a look at test files
 =========
