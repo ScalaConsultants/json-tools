@@ -1,4 +1,4 @@
-#jsonTools [![Build Status](https://travis-ci.org/ScalaConsultants/jsonTools.png?branch=master)](https://travis-ci.org/ScalaConsultants/jsonTools)
+#jsonComparator [![Build Status](https://travis-ci.org/ScalaConsultants/jsonTools.png?branch=master)](https://travis-ci.org/ScalaConsultants/jsonTools)
 ###A toolbox for working with JSON formatted data.  
 The main target of jsonTools is to enable users to compare json against a given schema, which is useful when doing API driven development or using some external schema as JSON definition. JsonTools compare both data structure and types. The presence of data is also validated.
 ###Usage examples
