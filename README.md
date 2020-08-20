@@ -29,3 +29,5 @@ compareResult.hasMinimalFieldSet must be equalTo true
 ```
 ####For more examples please take a look at test files
 =========
+
+Developed by [Scalac](https://scalac.io/?utm_source=scalac_github&utm_campaign=scalac1&utm_medium=web)
